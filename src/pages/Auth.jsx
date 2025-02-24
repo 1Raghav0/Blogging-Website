@@ -1,3 +1,5 @@
+
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/Firebase";
@@ -18,33 +20,36 @@ const Auth = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       let userCredential;
-  
+
       if (isSignUp) {
         userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
         const user = userCredential.user;
-  
+
         // Store name in Firebase user profile
         await updateProfile(user, { displayName: formData.name });
-  
-        // Ensure the UI updates immediately
+        await user.reload(); // Ensure profile is updated
+
+        // Store user in localStorage
         const updatedUser = { name: formData.name, email: user.email };
-        localStorage.setItem("user", JSON.stringify(updatedUser)); 
-        setTimeout(() => window.location.reload(), 500); //  Reload after small delay
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        alert("Account created successfully!");
+        navigate("/dashboard");
       } else {
         userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
         const user = userCredential.user;
-  
+
         // Retrieve name from Firebase Auth
         const name = user.displayName || "User";
         const loggedInUser = { name, email: user.email };
-  
+
         // Store in localStorage
         localStorage.setItem("user", JSON.stringify(loggedInUser));
-  
+
         alert("Sign-in successful!");
         navigate("/dashboard");
       }
@@ -57,9 +62,15 @@ const handleSubmit = async (e) => {
   const googleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Store Google user details in localStorage
+      const googleUser = { name: user.displayName, email: user.email };
+      localStorage.setItem("user", JSON.stringify(googleUser));
+
       alert("Google Sign-in successful!");
-      navigate("/chatroom");
+      navigate("/dashboard");
     } catch (error) {
       alert(error.message);
     }
@@ -70,7 +81,6 @@ const handleSubmit = async (e) => {
       <div className="bg-white shadow-lg p-8 rounded-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center">{isSignUp ? "Create an Account" : "Welcome Back!"}</h2>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          {/* Name Field (Only for Sign Up) */}
           {isSignUp && (
             <input
               type="text"
