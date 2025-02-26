@@ -4,13 +4,20 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase/Firebase";
-import { collection, query, where, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import Mycontext from "../context/Mycontext";
-import DOMPurify from "dompurify"; // Import DOMPurify for sanitization
+import DOMPurify from "dompurify";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [blogs, setBlogs] = useState([]); 
+  const [blogs, setBlogs] = useState([]);
   const navigate = useNavigate();
   const { mode } = useContext(Mycontext);
 
@@ -23,20 +30,16 @@ const Dashboard = () => {
   }, []);
 
   const fetchUserBlogs = (email) => {
-    const q = query(
-      collection(db, "blogs"),
-      where("authorEmail", "==", email),
-    );
+    const q = query(collection(db, "blogs"), where("authorEmail", "==", email));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const userBlogs = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(0), 
-        };
-      });
+      const userBlogs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt
+          ? doc.data().createdAt.toDate()
+          : new Date(0),
+      }));
       userBlogs.sort((a, b) => b.createdAt - a.createdAt);
       setBlogs(userBlogs);
     });
@@ -60,8 +63,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div className={`min-h-screen pt-10 ${mode === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"}`}>
-      <div className="max-w-4xl mx-auto mt-28 p-6 bg-white shadow-lg rounded-lg">
+    <div
+      className={`min-h-screen pt-2 pb-4 ${
+        mode === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
+      }`}
+    >
+      <div className="max-w-4xl mx-auto mt-28 mb-6 p-6 bg-white shadow-lg rounded-lg">
         {user ? (
           <div className="text-center">
             <h2 className="text-2xl font-semibold">Welcome, {user.name} 👋</h2>
@@ -85,48 +92,69 @@ const Dashboard = () => {
 
             <h3 className="text-xl font-semibold mt-8">Your Blogs</h3>
             {blogs.length > 0 ? (
-              <div className="mt-4 grid gap-6 grid-cols-1 md:grid-cols-2">
+              <div className="mt-4 p-6 grid gap-6 grid-cols-1 md:grid-cols-2">
                 {blogs.map((blog) => (
-                  <div key={blog.id} className="border p-4 rounded-lg shadow-md bg-gradient-to-tr from-black to-gray-400">
-                    <h3 className="text-lg font-semibold text-white">{blog.title}</h3>
-                    
-                    {/* Render sanitized HTML content correctly */}
-                    <div 
-                      className="text-white mt-1 truncate"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content.substring(0, 100) + "...") }}
-                    />
+                  <div
+                    key={blog.id}
+                    className="relative rounded-lg overflow-hidden shadow-md h-64 flex flex-col justify-end"
+                    style={{
+                      backgroundImage: `url(${
+                        blog.image || "/default-image.jpg"
+                      })`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/50"></div>
 
-                    <div className="mt-4 flex justify-between">
-                      <button
-                        onClick={() => navigate(`/blog/${blog.id}`)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
-                      >
-                        View Full
-                      </button>
+                    <div className="relative p-4 text-white">
+                      <h3 className="text-lg font-semibold">{blog.title}</h3>
 
-                      <button
-                        onClick={() => navigate(`/edit-blog/${blog.id}`)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
-                      >
-                        Edit
-                      </button>
+                      <p
+                        className="mt-1 truncate"
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(
+                            blog.content.substring(0, 100) + "..."
+                          ),
+                        }}
+                      />
 
-                      <button
-                        onClick={() => handleDelete(blog.id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
-                      >
-                        Delete
-                      </button>
+                      <div className="mt-4 flex justify-between">
+                        <button
+                          onClick={() => navigate(`/blog/${blog.id}`)}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                        >
+                          View Full
+                        </button>
+
+                        <button
+                          onClick={() => navigate(`/edit-blog/${blog.id}`)}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(blog.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 mt-4">You have not published any blogs yet.</p>
+              <p className="text-gray-500 mt-4">
+                You have not published any blogs yet.
+              </p>
             )}
           </div>
         ) : (
-          <p className="text-center text-red-500">No user found. Please login.</p>
+          <p className="text-center text-red-500">
+            No user found. Please login.
+          </p>
         )}
       </div>
     </div>

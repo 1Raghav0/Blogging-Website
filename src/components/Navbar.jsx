@@ -1,7 +1,7 @@
 
 
 import { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";  // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import Mycontext from "../context/Mycontext";
 import "remixicon/fonts/remixicon.css";
 import SearchDialog from "./SearchDialog";
@@ -15,7 +15,7 @@ const Navbar = () => {
   const { mode, toggleMode } = useContext(Mycontext);
   const [shareOpen, setShareOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();  // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     //  Fetch stored user info from localStorage
@@ -44,9 +44,9 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setUser(null);
-      localStorage.removeItem("user");
-      navigate("/"); // Redirect to Home Page after logout
+      localStorage.removeItem("user"); 
+      setUser(null);  
+      navigate("/");  
     } catch (error) {
       console.error("Logout Error:", error);
     }
@@ -55,7 +55,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
-        <div className="max-w-7xl mx-auto h-20 px-8 py-2 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto h-20 px-6 py-2 flex justify-between items-center">
           {/* Logo */}
           <div>
             <img src="./logo.jpg" className="w-15 h-auto rounded-lg" alt="Logo" />
@@ -64,8 +64,10 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <ul className="hidden lg:flex items-center gap-6 text-gray-700 font-medium">
             <li><Link to="/" className="hover:text-green-500">Home</Link></li>
+            <li><Link to="/about-us" className="hover:text-green-500">About Us</Link></li>
             <li><Link to="/blog" className="hover:text-green-500">Blog</Link></li>
-            <li><Link to="/adminlogin" className="hover:text-green-500">AdminLogin</Link></li>
+            <li><Link to="/dashboard" className="hover:text-green-500">Admin Dashboard</Link></li>
+            <li><Link to="/contact" className="hover:text-green-500">Contact Us</Link></li>
             <li>
               <i 
                 onClick={() => setSearchOpen(true)} 
@@ -106,7 +108,7 @@ const Navbar = () => {
             ) : (
               <Link to="/auth">
                 <button className="bg-green-500 px-4 py-2 rounded-md text-white font-semibold hover:bg-green-600 transition cursor-pointer">
-                  Sign In
+                AdminLogin
                 </button>
               </Link>
             )}
@@ -135,8 +137,10 @@ const Navbar = () => {
             {/* Sidebar Links */}
             <ul className="flex flex-col gap-6 text-lg font-medium mt-8">
               <li><Link to="/" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Home</Link></li>
+              <li><Link to="/about-us" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>About Us</Link></li>
               <li><Link to="/blog" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Blog</Link></li>
-              <li><Link to="/adminlogin" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>AdminLogin</Link></li>
+              <li><Link to="/dashboard" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link></li>
+              <li><Link to="/contact" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Contact Us</Link></li>
               <li className="flex items-center gap-x-10">
                 <i 
                   onClick={() => setSearchOpen(true)} 
@@ -172,7 +176,7 @@ const Navbar = () => {
             ) : (
               <Link to="/auth">
                 <button className="bg-green-500 px-4 py-2 rounded-md text-white font-semibold hover:bg-green-600 transition cursor-pointer">
-                  Sign In
+                AdminLogin
                 </button>
               </Link>
             )}

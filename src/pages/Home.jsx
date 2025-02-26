@@ -1,6 +1,7 @@
 import Layout from "../components/Layout"
 import HeroSection from "../components/HeroSection"
 import BlogPostCard from "../components/BlogPostCard"
+import AboutUs from "./AboutUs"
 
 
 
@@ -10,6 +11,7 @@ const Home = () => {
     <Layout>
     <HeroSection />
     <BlogPostCard />
+    <AboutUs />
     </Layout>
     
     </>

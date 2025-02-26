@@ -56,7 +56,7 @@ const SearchDialog = ({ isOpen, onClose }) => {
   );
 };
 
-//  Define PropTypes for props validation
+
 SearchDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,

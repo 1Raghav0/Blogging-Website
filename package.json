@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@tailwindcss/vite": "^4.0.8",
     "@tinymce/tinymce-react": "^6.0.0",
     "dompurify": "^3.2.4",
+    "emailjs-com": "^3.2.0",
     "firebase": "^11.3.1",
     "framer-motion": "^12.4.7",
     "prop-types": "^15.8.1",
