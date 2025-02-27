@@ -18,13 +18,16 @@ const Navbar = () => {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-    //  Fetch stored user info from localStorage
+    // Update body background based on dark mode
+    document.body.className = mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-black";
+
+    // Fetch stored user info from localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
     }
 
-    //  Listen for Firebase Auth state changes
+    // Listen for Firebase Auth state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         const userData = {
@@ -33,12 +36,12 @@ const Navbar = () => {
         };
 
         setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData)); //  Store in localStorage
+        localStorage.setItem("user", JSON.stringify(userData));
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [mode]);
 
   // Logout Function
   const handleLogout = async () => {
@@ -54,20 +57,26 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
+      <nav className={`w-full fixed top-0 left-0 z-50 shadow-md transition-colors duration-300 
+        ${mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-700"}`}>
+        
         <div className="max-w-7xl mx-auto h-20 px-6 py-2 flex justify-between items-center">
+          
           {/* Logo */}
           <div>
             <img src="./logo.jpg" className="w-15 h-auto rounded-lg" alt="Logo" />
           </div>
 
           {/* Desktop Menu */}
-          <ul className="hidden lg:flex items-center gap-6 text-gray-700 font-medium">
-            <li><Link to="/" className="hover:text-green-500">Home</Link></li>
-            <li><Link to="/about-us" className="hover:text-green-500">About Us</Link></li>
-            <li><Link to="/blog" className="hover:text-green-500">Blog</Link></li>
-            <li><Link to="/dashboard" className="hover:text-green-500">Admin Dashboard</Link></li>
-            <li><Link to="/contact" className="hover:text-green-500">Contact Us</Link></li>
+          <ul className={`hidden lg:flex items-center gap-6 font-medium 
+            ${mode === "dark" ? "text-white" : "text-gray-700"}`}>
+            
+            <li><Link to="/" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Home</Link></li>
+            <li><Link to="/about-us" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>About Us</Link></li>
+            <li><Link to="/blog" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Blog</Link></li>
+            <li><Link to="/dashboard" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Admin Dashboard</Link></li>
+            <li><Link to="/contact" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Contact Us</Link></li>
+            
             <li>
               <i 
                 onClick={() => setSearchOpen(true)} 
@@ -83,10 +92,11 @@ const Navbar = () => {
             <li>
               <button
                 onClick={toggleMode}
-                className="px-4 py-2 rounded-lg transition text-sm font-semibold border border-gray-500 cursor-pointer"
+                className="px-4 py-2 rounded-lg transition text-sm font-semibold border cursor-pointer"
                 style={{
                   background: mode === "dark" ? "white" : "black",
                   color: mode === "dark" ? "black" : "white",
+                  borderColor: mode === "dark" ? "white" : "black",
                 }}
               >
                 {mode === "dark" ? "Light Mode 🌞" : "Dark Mode 🌙"}
@@ -94,11 +104,11 @@ const Navbar = () => {
             </li>
           </ul>
 
-          {/* Authentication Button (Visible only on large screens) */}
+          {/* Authentication Button */}
           <div className="hidden lg:block">
             {user ? (
               <div className="flex items-center gap-4">
-                <span className="font-medium text-gray-700">Hello, {user.name}</span>
+                <span className="font-medium">Hello, {user.name}</span>
                 <button 
                   onClick={handleLogout} 
                   className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer">
@@ -108,7 +118,7 @@ const Navbar = () => {
             ) : (
               <Link to="/auth">
                 <button className="bg-green-500 px-4 py-2 rounded-md text-white font-semibold hover:bg-green-600 transition cursor-pointer">
-                AdminLogin
+                  Admin Login
                 </button>
               </Link>
             )}
@@ -124,52 +134,40 @@ const Navbar = () => {
 
         {/* Sidebar Menu */}
         <div
-          className={`fixed top-0 left-0 w-72 h-full bg-gray-300 shadow-lg z-50 transform ${
-            menuOpen ? "translate-x-0" : "-translate-x-full"
-          } transition-transform ease-in-out duration-600`}
+          className={`fixed top-0 left-0 w-72 h-full shadow-lg z-50 transform 
+            ${menuOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-600 
+            ${mode === "dark" ? "bg-gray-800 text-white" : "bg-gray-300 text-black"}`}
         >
           <div className="p-6">
-            {/* Close Button */}
             <button onClick={() => setMenuOpen(false)} className="absolute top-4 right-4 cursor-pointer">
               <i className="ri-close-line text-3xl"></i>
             </button>
 
-            {/* Sidebar Links */}
             <ul className="flex flex-col gap-6 text-lg font-medium mt-8">
-              <li><Link to="/" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Home</Link></li>
-              <li><Link to="/about-us" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>About Us</Link></li>
-              <li><Link to="/blog" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Blog</Link></li>
-              <li><Link to="/dashboard" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link></li>
-              <li><Link to="/contact" className="hover:text-green-500" onClick={() => setMenuOpen(false)}>Contact Us</Link></li>
+              <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
+              <li><Link to="/about-us" onClick={() => setMenuOpen(false)}>About Us</Link></li>
+              <li><Link to="/blog" onClick={() => setMenuOpen(false)}>Blog</Link></li>
+              <li><Link to="/dashboard" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link></li>
+              <li><Link to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</Link></li>
+
               <li className="flex items-center gap-x-10">
-                <i 
-                  onClick={() => setSearchOpen(true)} 
-                  className="ri-search-eye-line text-xl cursor-pointer hover:text-green-500 transition"
-                ></i>
-                <i
-                  className="ri-share-line text-xl cursor-pointer hover:text-green-500 transition"
-                  onClick={() => setShareOpen(true)}
-                ></i>
+                <i onClick={() => setSearchOpen(true)} className="ri-search-eye-line text-xl cursor-pointer"></i>
+                <i onClick={() => setShareOpen(true)} className="ri-share-line text-xl cursor-pointer"></i>
               </li>
+
               <li>
-                <button
-                  onClick={toggleMode}
-                  className="px-4 py-2 rounded-lg transition text-sm font-semibold border border-gray-500 cursor-pointer"
-                  style={{
-                    background: mode === "dark" ? "white" : "black",
-                    color: mode === "dark" ? "black" : "white",
-                  }}
-                >
+                <button onClick={toggleMode} className="px-4 py-2 rounded-lg border transition">
                   {mode === "dark" ? "Light Mode 🌞" : "Dark Mode 🌙"}
                 </button>
               </li>
               <li>
               {user ? (
               <div className="flex items-center gap-4">
-                <span className="font-medium text-gray-700">Hello, {user.name}</span>
+                <span className={`text-black ${mode == "dark" ? "text-white" : "text-black"}`}>Hello, {user.name}</span>
                 <button 
                   onClick={handleLogout} 
-                  className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer">
+                  className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer
+                   ">
                   Logout
                 </button>
               </div>
@@ -196,4 +194,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

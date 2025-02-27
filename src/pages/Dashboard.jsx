@@ -25,14 +25,16 @@ const Dashboard = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
-      fetchUserBlogs(storedUser.email);
+      const unsubscribe = fetchUserBlogs(storedUser.email);
+
+      return () => unsubscribe && unsubscribe(); // Cleanup listener on unmount
     }
   }, []);
 
   const fetchUserBlogs = (email) => {
     const q = query(collection(db, "blogs"), where("authorEmail", "==", email));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    return onSnapshot(q, (snapshot) => {
       const userBlogs = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -43,8 +45,6 @@ const Dashboard = () => {
       userBlogs.sort((a, b) => b.createdAt - a.createdAt);
       setBlogs(userBlogs);
     });
-
-    return unsubscribe;
   };
 
   const handleLogout = () => {
@@ -64,39 +64,47 @@ const Dashboard = () => {
 
   return (
     <div
-      className={`min-h-screen pt-2 pb-4 ${
+      className={`min-h-screen pt-2 pb-4 transition-colors duration-300 ${
         mode === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
       }`}
     >
-      <div className="max-w-4xl mx-auto mt-28 mb-6 p-6 bg-white shadow-lg rounded-lg">
+      <div
+        className={`max-w-4xl mx-auto mt-28 mb-6 p-6 shadow-lg rounded-lg transition-all duration-300 ${
+          mode === "dark" ? "bg-gray-800 text-gray-300" : "bg-white"
+        }`}
+      >
         {user ? (
           <div className="text-center">
-            <h2 className="text-2xl font-semibold">Welcome, {user.name} 👋</h2>
-            <p className="text-gray-600 mt-2">Email: {user.email}</p>
+            <h2 className="text-2xl font-semibold">
+              Welcome, {user.name || "User"} 👋
+            </h2>
+            <p className="mt-2 text-gray-500">Email: {user.email}</p>
 
+            {/* Action Buttons */}
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => navigate("/create-blog")}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition cursor-pointer"
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-all"
               >
                 Create Blog
               </button>
 
               <button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition cursor-pointer"
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-all"
               >
                 Logout
               </button>
             </div>
 
+            {/* User Blogs Section */}
             <h3 className="text-xl font-semibold mt-8">Your Blogs</h3>
             {blogs.length > 0 ? (
               <div className="mt-4 p-6 grid gap-6 grid-cols-1 md:grid-cols-2">
                 {blogs.map((blog) => (
                   <div
                     key={blog.id}
-                    className="relative rounded-lg overflow-hidden shadow-md h-64 flex flex-col justify-end"
+                    className="relative rounded-lg overflow-hidden shadow-md h-64 flex flex-col justify-end transition-transform transform hover:scale-105"
                     style={{
                       backgroundImage: `url(${
                         blog.image || "/default-image.jpg"
@@ -119,24 +127,25 @@ const Dashboard = () => {
                         }}
                       />
 
+                      {/* Blog Action Buttons */}
                       <div className="mt-4 flex justify-between">
                         <button
                           onClick={() => navigate(`/blog/${blog.id}`)}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition-all cursor-pointer"
                         >
                           View Full
                         </button>
 
                         <button
                           onClick={() => navigate(`/edit-blog/${blog.id}`)}
-                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm transition-all cursor-pointer"
                         >
                           Edit
                         </button>
 
                         <button
                           onClick={() => handleDelete(blog.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-all cursor-pointer"
                         >
                           Delete
                         </button>
