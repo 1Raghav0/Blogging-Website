@@ -1,20 +1,17 @@
 
-
+import PropTypes from "prop-types";
 import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Mycontext from "../context/Mycontext";
 import "remixicon/fonts/remixicon.css";
-import SearchDialog from "./SearchDialog";
 import ShareDialogBox from "../components/ShareDialogBox";
 import { auth } from "../firebase/Firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
-const Navbar = () => {
+const Navbar = ({ user, setUser }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const { mode, toggleMode } = useContext(Mycontext);
   const [shareOpen, setShareOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate(); 
 
   useEffect(() => {
@@ -41,7 +38,16 @@ const Navbar = () => {
     });
 
     return () => unsubscribe();
-  }, [mode]);
+  }, [mode, setUser]);
+
+
+    // Load user from localStorage on mount
+    useEffect(() => {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    }, [mode, setUser]);
 
   // Logout Function
   const handleLogout = async () => {
@@ -72,17 +78,10 @@ const Navbar = () => {
             ${mode === "dark" ? "text-white" : "text-gray-700"}`}>
             
             <li><Link to="/" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Home</Link></li>
-            <li><Link to="/about-us" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>About Us</Link></li>
+            <li><Link to="/about" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>About Us</Link></li>
             <li><Link to="/blog" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Blog</Link></li>
             <li><Link to="/dashboard" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Admin Dashboard</Link></li>
             <li><Link to="/contact" className={`${mode === "dark" ? "hover:text-green-300" : "hover:text-green-500"}`}>Contact Us</Link></li>
-            
-            <li>
-              <i 
-                onClick={() => setSearchOpen(true)} 
-                className="ri-search-eye-line text-xl cursor-pointer hover:text-green-500 transition"
-              ></i>
-            </li>
             <li>
               <i
                 className="ri-share-line text-xl cursor-pointer hover:text-green-500 transition"
@@ -124,6 +123,7 @@ const Navbar = () => {
             )}
           </div>
 
+
           {/* Mobile Menu Button */}
           <div className="lg:hidden">
             <button onClick={() => setMenuOpen(true)}>
@@ -145,18 +145,17 @@ const Navbar = () => {
 
             <ul className="flex flex-col gap-6 text-lg font-medium mt-8">
               <li><Link to="/" onClick={() => setMenuOpen(false)}>Home</Link></li>
-              <li><Link to="/about-us" onClick={() => setMenuOpen(false)}>About Us</Link></li>
+              <li><Link to="/about" onClick={() => setMenuOpen(false)}>About Us</Link></li>
               <li><Link to="/blog" onClick={() => setMenuOpen(false)}>Blog</Link></li>
               <li><Link to="/dashboard" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link></li>
               <li><Link to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</Link></li>
 
-              <li className="flex items-center gap-x-10">
-                <i onClick={() => setSearchOpen(true)} className="ri-search-eye-line text-xl cursor-pointer"></i>
+              <li>
                 <i onClick={() => setShareOpen(true)} className="ri-share-line text-xl cursor-pointer"></i>
               </li>
 
               <li>
-                <button onClick={toggleMode} className="px-4 py-2 rounded-lg border transition">
+                <button onClick={toggleMode} className="px-4 py-2 rounded-lg border transition cursor-pointer">
                   {mode === "dark" ? "Light Mode 🌞" : "Dark Mode 🌙"}
                 </button>
               </li>
@@ -184,13 +183,16 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Search Dialog */}
-      <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-
       {/* Share Dialog */}
       <ShareDialogBox isOpen={shareOpen} onClose={() => setShareOpen(false)} shareUrl={window.location.href} />
     </>
   );
+};
+
+
+Navbar.propTypes = {
+  user: PropTypes.object,
+  setUser: PropTypes.func.isRequired,
 };
 
 export default Navbar;

@@ -1,5 +1,3 @@
-
-
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import Mycontext from "../context/Mycontext";
@@ -26,7 +24,7 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold text-white">Quick Links</h3>
           <ul className="mt-2 space-y-1">
-            {["Home", "Blog", "About", "Contact"].map((item, index) => (
+            {["About","Blog", "Contact"].map((item, index) => (
               <li key={index}>
                 <Link
                   to={`/${item.toLowerCase().replace(" ", "-")}`}

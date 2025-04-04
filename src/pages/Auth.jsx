@@ -1,5 +1,4 @@
-
-
+import PropTypes from "prop-types";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/Firebase";
@@ -12,7 +11,7 @@ import {
 } from "firebase/auth";
 import Mycontext from "../context/Mycontext";
 
-const Auth = () => {
+const Auth = ({ setUser }) => {  // <-- Accept setUser as a prop
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -45,8 +44,12 @@ const Auth = () => {
 
         await updateProfile(user, { displayName: formData.name });
 
-        // Store user in localStorage
         const updatedUser = { name: formData.name, email: user.email };
+        
+        // Update state immediately
+        setUser(updatedUser);
+
+        // Store user in localStorage
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
         navigate("/dashboard");
@@ -56,10 +59,16 @@ const Auth = () => {
 
         const name = user.displayName || "User";
         const loggedInUser = { name, email: user.email };
+        
+        // Update state immediately
+        setUser(loggedInUser);
+
+        // Store user in localStorage
         localStorage.setItem("user", JSON.stringify(loggedInUser));
 
         navigate("/dashboard");
       }
+      
     } catch (error) {
       setError(error.message);
     } finally {
@@ -76,6 +85,11 @@ const Auth = () => {
       const user = result.user;
 
       const googleUser = { name: user.displayName, email: user.email };
+      
+      // Update state immediately
+      setUser(googleUser);
+
+      // Store user in localStorage
       localStorage.setItem("user", JSON.stringify(googleUser));
 
       navigate("/dashboard");
@@ -168,6 +182,11 @@ const Auth = () => {
       </div>
     </div>
   );
+};
+
+
+Auth.propTypes = {
+  setUser: PropTypes.func.isRequired,
 };
 
 export default Auth;

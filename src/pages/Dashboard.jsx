@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth, db } from "../firebase/Firebase";
+import { db } from "../firebase/Firebase";
 import {
   collection,
   query,
@@ -47,14 +46,6 @@ const Dashboard = () => {
     });
   };
 
-  const handleLogout = () => {
-    signOut(auth).then(() => {
-      localStorage.removeItem("user");
-      setUser(null);
-      navigate("/");
-    });
-  };
-
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       await deleteDoc(doc(db, "blogs", id));
@@ -64,8 +55,8 @@ const Dashboard = () => {
 
   return (
     <div
-      className={`min-h-screen pt-2 pb-4 transition-colors duration-300 ${
-        mode === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
+      className={`min-h-screen m-4 pt-2 pb-4 transition-colors duration-300 ${
+        mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       }`}
     >
       <div
@@ -87,13 +78,6 @@ const Dashboard = () => {
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-all"
               >
                 Create Blog
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-all"
-              >
-                Logout
               </button>
             </div>
 

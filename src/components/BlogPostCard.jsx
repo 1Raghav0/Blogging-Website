@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState, useContext } from "react";
 import { db } from "../firebase/Firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
@@ -29,7 +27,9 @@ const BlogPostCard = () => {
   return (
     <div
       className={`min-h-screen py-10 transition-colors duration-300 
-        ${mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-800"}`}
+        ${
+          mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+        }`}
     >
       <h1 className="text-3xl font-bold text-center mb-10">
         Latest <span className="text-green-500">Blog Posts</span>
@@ -41,7 +41,11 @@ const BlogPostCard = () => {
             <motion.div
               key={post.id}
               className={`shadow-lg rounded-xl overflow-hidden transform hover:scale-105 transition duration-300 
-                ${mode === "dark" ? "bg-gray-800 border border-gray-700" : "bg-blue-100"}`}
+                ${
+                  mode === "dark"
+                    ? "bg-gray-800 border border-gray-700"
+                    : "bg-blue-100"
+                }`}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -52,9 +56,7 @@ const BlogPostCard = () => {
                 className="w-full h-48 object-cover rounded-t-xl"
               />
               <div className="p-6">
-                <h2 className="text-2xl font-semibold">
-                  {post.title}
-                </h2>
+                <h2 className="text-2xl font-semibold">{post.title}</h2>
 
                 <p
                   className="mt-2 transition-colors duration-300"
@@ -70,6 +72,13 @@ const BlogPostCard = () => {
                 {post.authorName && (
                   <p className="text-lg mt-2 transition-colors duration-300">
                     <span className="font-semibold">By:</span> {post.authorName}
+                    <br></br>
+                    <span className="font-semibold">Published on:</span>{" "}
+                    {new Date().toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                 )}
 
